@@ -4,9 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:video_compress_new/src/progress_callback/compress_mixin.dart';
-import 'package:video_compress_new/video_compress_new.dart';
+import 'package:video_compressor_plus/src/progress_callback/compress_mixin.dart';
+import 'package:video_compressor_plus/video_compressor_plus.dart';
 
+/// Interface of the video compression singleton.
+///
+/// Reach it through the [VideoCompress] getter; the methods live in the
+/// [Compress] extension.
 abstract class IVideoCompress extends CompressMixin {}
 
 class _VideoCompressImpl extends IVideoCompress {
@@ -25,10 +29,22 @@ class _VideoCompressImpl extends IVideoCompress {
   }
 }
 
+/// The singleton entry point of this package.
+///
+/// Capitalised so it reads like a class, matching the original
+/// `video_compress` API.
+///
+/// ```dart
+/// final info = await VideoCompress.compressVideo(path);
+/// ```
 // ignore: non_constant_identifier_names
 IVideoCompress get VideoCompress => _VideoCompressImpl.instance;
 
+/// Every operation offered by [VideoCompress].
 extension Compress on IVideoCompress {
+  /// Releases the singleton and its platform channel handler.
+  ///
+  /// The next access to [VideoCompress] creates a fresh instance.
   void dispose() {
     _VideoCompressImpl._dispose();
   }
@@ -174,6 +190,10 @@ extension Compress on IVideoCompress {
     return await _invoke<bool>('deleteAllCache');
   }
 
+  /// Sets the native log verbosity.
+  ///
+  /// `0` is quiet and higher values are more verbose. Android only; a no-op
+  /// elsewhere.
   Future<void> setLogLevel(int logLevel) async {
     return await _invoke<void>('setLogLevel', {
       'logLevel': logLevel,

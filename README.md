@@ -1,161 +1,103 @@
-# video_compress_new
+# video_compressor_plus
 
-> **A maintained continuation of [`video_compress`](https://pub.dev/packages/video_compress)**
-> by [Jonny Borges](https://github.com/jonataslaw), unmaintained since February 2025
-> (208 open issues, four unmerged pull requests adding Swift Package Manager support).
->
-> This fork adds **Swift Package Manager support for iOS and macOS** and nothing else.
-> The Dart API is byte-for-byte the same — only the import path changes:
->
-> ```dart
-> import 'package:video_compress_new/video_compress_new.dart';
-> ```
->
-> All credit for the original work belongs to Jonny Borges and the contributors of
-> the upstream project. Released under the same MIT license.
+[![pub package](https://img.shields.io/pub/v/video_compressor_plus.svg)](https://pub.dev/packages/video_compressor_plus)
+
+Compress videos, trim them, strip audio, and extract thumbnails — using the
+platform's own encoders (`AVAssetExportSession` on iOS/macOS, `MediaCodec` on
+Android). No FFmpeg binaries, so **nothing is added to your app's download
+size**.
+
+## Why this package exists
+
+This is a maintained continuation of
+[`video_compress`](https://pub.dev/packages/video_compress) by
+[Jonny Borges](https://github.com/jonataslaw), which has had no release since
+February 2025 — 208 open issues, and four unmerged pull requests adding Swift
+Package Manager support.
+
+That last point is what forced the fork. Flutter warns:
+
+> The following plugins do not support Swift Package Manager for ios:
+> `video_compress` — This will become an error in a future version of Flutter.
+
+In a project that has otherwise migrated to SPM, `video_compress` is often the
+**only** plugin left on CocoaPods, keeping a whole build system alive for one
+dependency. This package fixes that and keeps everything else identical.
+
+All credit for the original work belongs to Jonny Borges and the upstream
+contributors. Released under the same MIT license.
+
+## Migrating from `video_compress`
+
+Change the import. That is the whole migration:
+
+```diff
+- import 'package:video_compress/video_compress.dart';
++ import 'package:video_compressor_plus/video_compressor_plus.dart';
+```
+
+`VideoCompress`, `VideoQuality`, `MediaInfo` and every method keep their names,
+signatures, and behaviour. See the [CHANGELOG](CHANGELOG.md) for the one small
+type-level exception.
+
+## Usage
+
+```dart
+import 'package:video_compressor_plus/video_compressor_plus.dart';
+
+// Report progress — subscribe before you start.
+final subscription = VideoCompress.compressProgress$.subscribe(
+  (progress) => print('$progress%'),
+);
+
+final info = await VideoCompress.compressVideo(
+  file.path,
+  quality: VideoQuality.MediumQuality,
+  deleteOrigin: false,
+  includeAudio: true,
+);
+
+subscription.unsubscribe();
+```
+
+Trim a clip and drop its audio:
+
+```dart
+final info = await VideoCompress.compressVideo(
+  file.path,
+  startTime: 5,        // seconds
+  duration: 15,        // seconds
+  includeAudio: false,
+);
+```
+
+Extract a thumbnail:
+
+```dart
+final bytes = await VideoCompress.getByteThumbnail(file.path, quality: 50);
+final file  = await VideoCompress.getFileThumbnail(path, quality: 50);
+```
+
+Cancel a running compression:
+
+```dart
+await VideoCompress.cancelCompression();
+```
+
+See [`example/`](example) for a complete app.
+
+## Platform support
+
+| Platform | Supported | Encoder |
+| --- | --- | --- |
+| Android | ✅ API 21+ | `MediaCodec` via [Transcoder](https://github.com/natario1/Transcoder) |
+| iOS | ✅ 12.0+ | `AVAssetExportSession` |
+| macOS | ✅ | `AVAssetExportSession` |
 
 ---
 
-Compress videos, remove audio, manipulate thumbnails, and make your video compatible with all platforms through this lightweight and efficient library.
-100% native code was used, we do not use FFMPEG as it is very slow, bloated and the GNU license is an obstacle for commercial applications.
-In addition, google chrome uses VP8/VP9, safari uses h264, and most of the time, it is necessary to encode the video in two formats, but not with this library.
-All video files are encoded in an MP4 container with AAC audio that allows 100% compatibility with safari, mozila, chrome, android and iOS.
-
-Works on ANDROID, IOS and desktop (just MacOS for now).
-
-
-
-# Table of Contents
-  - [Installing](#lets-get-started)
-  - [How to use](#how-to-use)
-    * [Imports](#imports)
-    * [Video compression](#video-compression)
-    * [Check compress state](#check-compress-state)
-    * [Get memory thumbnail from VideoPath](#get-memory-thumbnail-from-videopath)
-    * [Get File thumbnail from VideoPath](#get-file-thumbnail-from-videopath)
-    * [Get media information](#get-media-information)
-    * [delete all cache files](#delete-all-cache-files)
-    * [Listen the compression progress](#listen-the-compression-progress)
-  - [TODO](#todo)
-
-# Lets Get Started
-
-### 1. Depend on it
-Add this to your package's `pubspec.yaml` file:
-
-```yaml
-dependencies:
-  video_compress: ^3.1.0
-```
-
-### 2. Install it
-
-You can install packages from the command line:
-
-with `pub`:
-
-```css
-$  pub get
-```
-
-### 3. Import it
-
-Now in your `Dart` code, you can use: 
-
-````dart
-import 'package:video_compress/video_compress.dart';
-````
-
-# How to use
-
-### Imports
-
-````dart
-import 'package:video_compress/video_compress.dart';
-    
-````
-
-## Video compression
-
-```dart
-MediaInfo mediaInfo = await VideoCompress.compressVideo(
-  path,
-  quality: VideoQuality.DefaultQuality, 
-  deleteOrigin: false, // It's false by default
-);
-```
-
-## Check compress state
-```dart
-VideoCompress.isCompressing
-```
-<!-- ## Cancel compression
-```dart
-await videoCompress.cancelCompression()
-``` -->
-
-## Get memory thumbnail from VideoPath
-```dart
-final uint8list = await VideoCompress.getByteThumbnail(
-  videopath,
-  quality: 50, // default(100)
-  position: -1 // default(-1)
-);
-```
-
-## Get File thumbnail from VideoPath
-```dart
-final thumbnailFile = await VideoCompress.getFileThumbnail(
-  videopath,
-  quality: 50, // default(100)
-  position: -1 // default(-1)
-);
-```
-
-## Get media information
-
-```dart
-final info = await VideoCompress.getMediaInfo(videopath);
-
-```
-
-## delete all cache files
-- Delete all files generated by this will delete all files located at 'video_compress', you shoule ought to know what are you doing.
-
-```dart
-await VideoCompress.deleteAllCache()
-```
-
-## Listen the compression progress
-```dart
-class _Compress extends State<Compress> {
-
-  Subscription _subscription;
-
-  @override
-  void initState() {
-    super.initState();
-    _subscription =
-        VideoCompress.compressProgress$.subscribe((progress) {
-      debugPrint('progress: $progress');
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _subscription.unsubscribe();
-  }
-}
-```
-
-### TODO
-- Add the trim video function
-- Add cancel function to Android
-
-## Methods
-| Functions         | Parameters                                                                                                                                                                                                                                                                                                                                    | Description                                                                                      | Returns             |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------- |
+## Upstream documentation
+-------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------- |
 | getByteThumbnail  | String `path`[video path], int `quality`(1-100)[thumbnail quality], int `position`[Get a thumbnail from video position]                                                                                                                                                                                                                       | get thumbnail from video `path`                                                                  | `Future<Uint8List>` |
 | getFileThumbnail  | String `path`[video path], int `quality`(1-100)[thumbnail quality], int `position`[Get a thumbnail from video position]                                                                                                                                                                                                                       | get thumbnail file from video `path`                                                             | `Future<File>`      |
 | getMediaInfo      | String `path`[video path]                                                                                                                                                                                                                                                                                                                     | get media information from video `path`                                                          | `Future<MediaInfo>` |

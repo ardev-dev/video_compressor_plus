@@ -1,0 +1,29 @@
+analyzer:
+  exclude:
+    - build/**
+    - android/**
+    - ios/**
+    - web/**
+    - windows/**
+    - macos/**
+    - linux/**
+include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    # Every public member is documented — a pub.dev quality requirement, and
+    # genuinely useful to anyone consuming the package.
+    public_member_api_docs: true
+    prefer_final_locals: true
+    unawaited_futures: true
+    avoid_print: true
+
+    # Deliberately off — do not enable.
+    #
+    # It fires on `VideoQuality.DefaultQuality` and the
+    # `MediaMetadataRetriever` constants (`METADATA_KEY_ARTIST`, …), all of
+    # which are part of the public API inherited from `video_compress`. This
+    # package promises that migrating to it is a one-line import change;
+    # renaming those values would break every consumer for no functional gain.
+    # The metadata constant names mirror the Android SDK on purpose.
+    constant_identifier_names: false

@@ -6,7 +6,7 @@ import FlutterMacOS
 import Foundation
 
 import file_selector_macos
-import video_compress_new
+import video_compressor_plus
 import video_player_avfoundation
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {

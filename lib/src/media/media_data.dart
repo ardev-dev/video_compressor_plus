@@ -1,12 +1,27 @@
+/// Base for the typed constant wrappers in this library.
+///
+/// Predates Dart's enhanced enums; kept because the constants below are part of
+/// the public API inherited from `video_compress`.
 abstract class Enum<T> {
-  final T _value;
-
+  /// Wraps a raw platform [value].
   const Enum(this._value);
 
+  final T _value;
+
+  /// The raw value passed to the platform channel.
   T get value => _value;
 }
 
-class MediaMetadataRetriever<int> extends Enum<int> {
+/// Metadata keys accepted by Android's `MediaMetadataRetriever`.
+///
+/// The bogus `<int>` type parameter this class carried upstream — which shadowed
+/// the real `int` type — was removed; [value] now genuinely resolves to `int`.
+///
+/// The `SCREAMING_CAPS` names mirror the Android SDK constants one-to-one on
+/// purpose, so a key found in Android documentation can be used here verbatim.
+/// Each entry documents the API level that introduced it; requesting a key on
+/// an older device yields `null` rather than throwing.
+class MediaMetadataRetriever extends Enum<int> {
   /// [Android] API level 10
   static const METADATA_KEY_ALBUM = MediaMetadataRetriever(1);
 
@@ -106,5 +121,6 @@ class MediaMetadataRetriever<int> extends Enum<int> {
   /// [Android] API level 10
   static const METADATA_KEY_YEAR = MediaMetadataRetriever(8);
 
-  const MediaMetadataRetriever(int value) : super(value);
+  /// Wraps the raw Android metadata key [value].
+  const MediaMetadataRetriever(super.value);
 }

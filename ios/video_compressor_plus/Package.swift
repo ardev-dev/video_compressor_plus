@@ -4,19 +4,19 @@
 import PackageDescription
 
 let package = Package(
-    name: "video_compress",
+    name: "video_compressor_plus",
     platforms: [
-        .macOS("10.14")
+        .iOS("12.0")
     ],
     products: [
-        .library(name: "video-compress", targets: ["video_compress"])
+        .library(name: "video-compressor-plus", targets: ["video_compressor_plus"])
     ],
     dependencies: [
         .package(name: "FlutterFramework", path: "../FlutterFramework")
     ],
     targets: [
         .target(
-            name: "video_compress",
+            name: "video_compressor_plus",
             dependencies: [
                 .product(name: "FlutterFramework", package: "FlutterFramework")
             ]
