@@ -1,4 +1,4 @@
-name: video_compress_example
+name: video_compress_new_example
 description: Demonstrates how to use the video_compress plugin.
 publish_to: 'none'
 
@@ -20,7 +20,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  video_compress:
+  video_compress_new:
     path: ../
 
 # For information on the generic Dart part of this file, see the

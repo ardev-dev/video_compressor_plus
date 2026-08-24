@@ -1,7 +1,9 @@
-name: video_compress
-description: Light library of video manipulation of Flutter. Compress video, remove audio, get video thumbnail from dart code.
-version: 3.1.4+abber.1
+name: video_compress_new
+description: Maintained continuation of video_compress with Swift Package Manager support. Compress video, remove audio, and get video thumbnails from Dart.
+version: 4.0.0
 homepage: https://github.com/zinon-software/video_compress
+repository: https://github.com/zinon-software/video_compress
+issue_tracker: https://github.com/zinon-software/video_compress/issues
 
 environment:
   sdk: ">=3.11.0 <4.0.0"

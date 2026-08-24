@@ -1,4 +1,20 @@
-# video_compress
+# video_compress_new
+
+> **A maintained continuation of [`video_compress`](https://pub.dev/packages/video_compress)**
+> by [Jonny Borges](https://github.com/jonataslaw), unmaintained since February 2025
+> (208 open issues, four unmerged pull requests adding Swift Package Manager support).
+>
+> This fork adds **Swift Package Manager support for iOS and macOS** and nothing else.
+> The Dart API is byte-for-byte the same — only the import path changes:
+>
+> ```dart
+> import 'package:video_compress_new/video_compress_new.dart';
+> ```
+>
+> All credit for the original work belongs to Jonny Borges and the contributors of
+> the upstream project. Released under the same MIT license.
+
+---
 
 Compress videos, remove audio, manipulate thumbnails, and make your video compatible with all platforms through this lightweight and efficient library.
 100% native code was used, we do not use FFMPEG as it is very slow, bloated and the GNU license is an obstacle for commercial applications.
