@@ -1,3 +1,12 @@
+## 4.0.1
+
+- Point `homepage`, `repository`, and `issue_tracker` at the current GitHub
+  account (`ardev-dev`). The 4.0.0 metadata still referenced the previous
+  account name; those links only worked through a GitHub redirect, which is not
+  something a published package should depend on.
+
+No code changes.
+
 ## 4.0.0
 
 First release of `video_compressor_plus`, a maintained continuation of
