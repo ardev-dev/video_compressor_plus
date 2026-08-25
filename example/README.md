@@ -1,4 +1,4 @@
-# video_compress_example
+# video_compressor_plus_example
 
 ```dart
 import 'dart:io';

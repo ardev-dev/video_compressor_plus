@@ -1,3 +1,21 @@
+## 4.1.0
+
+Completes the rename. Nothing in the package still carries the upstream
+`video_compress` identity, so the two can coexist in the same build without
+symbol or module collisions.
+
+- Native plugin classes renamed `VideoCompressPlugin` → `VideoCompressorPlusPlugin`
+  on iOS, macOS, and Android, with the files renamed to match and `pluginClass`
+  updated in `pubspec.yaml`. Two plugin classes with the same Objective-C
+  runtime name in one app is a real conflict, not a cosmetic one.
+- Example app identifiers renamed off `video_compress_example`.
+
+**Deliberately unchanged:** the Dart API — `VideoCompress`, `VideoQuality`,
+`MediaInfo`. Renaming those would break the promise that migrating from
+`video_compress` is a one-line import change. They live in a different package
+namespace, so they only collide if an app imports both packages at once, which
+no migration does.
+
 ## 4.0.2
 
 Fixes the CocoaPods build, which was broken in 4.0.0 and 4.0.1.

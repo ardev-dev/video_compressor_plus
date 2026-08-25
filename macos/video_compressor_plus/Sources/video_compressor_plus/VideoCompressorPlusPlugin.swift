@@ -1,7 +1,8 @@
-import Flutter
+import FlutterMacOS
 import AVFoundation
+import Cocoa
 
-public class VideoCompressPlugin: NSObject, FlutterPlugin {
+public class VideoCompressorPlusPlugin: NSObject, FlutterPlugin {
     private let channelName = "video_compressor_plus"
     private var exporter: AVAssetExportSession? = nil
     private var stopCommand = false
@@ -13,8 +14,8 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        let channel = FlutterMethodChannel(name: "video_compressor_plus", binaryMessenger: registrar.messenger())
-        let instance = VideoCompressPlugin(channel: channel)
+        let channel = FlutterMethodChannel(name: "video_compressor_plus", binaryMessenger: registrar.messenger)
+        let instance = VideoCompressorPlusPlugin(channel: channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
     
@@ -69,9 +70,10 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
         guard let img = try? assetImgGenerate.copyCGImage(at:time, actualTime: nil) else {
             return nil
         }
-        let thumbnail = UIImage(cgImage: img)
-        let compressionQuality = CGFloat(0.01 * Double(truncating: quality))
-        return thumbnail.jpegData(compressionQuality: compressionQuality)
+
+        let bitmapRep = NSBitmapImageRep(cgImage: img)
+        let jpegData = bitmapRep.representation(using: NSBitmapImageRep.FileType.jpeg, properties: [:])!
+        return jpegData
     }
     
     private func getByteThumbnail(_ path: String,_ quality: NSNumber,_ position: NSNumber,_ result: FlutterResult) {
@@ -182,11 +184,10 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
         
         let sourceVideoAsset = avController.getVideoAsset(sourceVideoUrl)
         let sourceVideoTrack = avController.getTrack(sourceVideoAsset)
-
-        let uuid = NSUUID()
+        
         let compressionUrl =
-        Utility.getPathUrl("\(Utility.basePath())/\(Utility.getFileName(path))\(uuid.uuidString).\(sourceVideoType)")
-
+            Utility.getPathUrl("\(Utility.basePath())/\(Utility.getFileName(path)).\(sourceVideoType)")
+        
         let timescale = sourceVideoAsset.duration.timescale
         let minStartTime = Double(startTime ?? 0)
         
@@ -224,8 +225,8 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
                                          userInfo: exporter, repeats: true)
         
         exporter.exportAsynchronously(completionHandler: {
-            timer.invalidate()
             if(self.stopCommand) {
+                timer.invalidate()
                 self.stopCommand = false
                 var json = self.getMediaInfoJson(path)
                 json["isCancel"] = true
@@ -233,6 +234,7 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
                 return result(jsonString)
             }
             if deleteOrigin {
+                timer.invalidate()
                 let fileManager = FileManager.default
                 do {
                     if fileManager.fileExists(atPath: path) {
@@ -245,17 +247,16 @@ public class VideoCompressPlugin: NSObject, FlutterPlugin {
                     print(error)
                 }
             }
-            var json = self.getMediaInfoJson(Utility.excludeEncoding(compressionUrl.path))
+            var json = self.getMediaInfoJson(compressionUrl.absoluteString)
             json["isCancel"] = false
             let jsonString = Utility.keyValueToJson(json)
             result(jsonString)
         })
-        self.exporter = exporter
     }
     
     private func cancelCompression(_ result: FlutterResult) {
-        stopCommand = true
         exporter?.cancelExport()
+        stopCommand = true
         result("")
     }
     

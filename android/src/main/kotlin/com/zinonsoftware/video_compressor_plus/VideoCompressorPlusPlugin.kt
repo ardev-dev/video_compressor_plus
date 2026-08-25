@@ -23,14 +23,14 @@ import java.util.*
 import java.util.concurrent.Future
 
 /**
- * VideoCompressPlugin
+ * VideoCompressorPlusPlugin
  */
-class VideoCompressPlugin : MethodCallHandler, FlutterPlugin {
+class VideoCompressorPlusPlugin : MethodCallHandler, FlutterPlugin {
 
 
     private var _context: Context? = null
     private var _channel: MethodChannel? = null
-    private val TAG = "VideoCompressPlugin"
+    private val TAG = "VideoCompressorPlusPlugin"
     private val LOG = Logger(TAG)
     private var transcodeFuture:Future<Void>? = null
     var channelName = "video_compressor_plus"
