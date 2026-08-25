@@ -1,3 +1,15 @@
+## 4.0.2
+
+Fixes the CocoaPods build, which was broken in 4.0.0 and 4.0.1.
+
+- The iOS and macOS podspecs still pointed `source_files` at the pre-rename
+  path (`video_compress/Sources/video_compress/**/*.swift`). CocoaPods matched
+  zero files, so no module was produced and any app using CocoaPods failed with
+  `Module 'video_compressor_plus' not found`. The Swift Package Manager path was
+  unaffected, which is why it went unnoticed.
+
+No Dart or native code changes.
+
 ## 4.0.1
 
 - Point `homepage`, `repository`, and `issue_tracker` at the current GitHub

@@ -4,7 +4,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:video_compress/video_compress.dart';
+import 'package:video_compressor_plus/video_compressor_plus.dart';
 
 void main() {
   runApp(MyApp());

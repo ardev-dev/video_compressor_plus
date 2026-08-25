@@ -2,7 +2,7 @@ name: video_compressor_plus
 description: >-
   Compress videos, trim them, strip audio, and extract thumbnails from Dart.
   A maintained continuation of video_compress, with Swift Package Manager support.
-version: 4.0.1
+version: 4.0.2
 
 homepage: https://github.com/ardev-dev/video_compressor_plus
 repository: https://github.com/ardev-dev/video_compressor_plus
