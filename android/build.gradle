@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 group 'com.zinonsoftware.video_compressor_plus'
 version '1.0-SNAPSHOT'
 
@@ -22,7 +25,21 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// AGP 9 enables built-in Kotlin by default. Only apply the legacy kotlin-android
+// plugin on AGP < 9, or when the host app opts out with android.builtInKotlin=false.
+// See https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin/for-plugin-authors
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+if (agpMajor < 9) {
+    apply plugin: 'kotlin-android'
+} else {
+    def builtInKotlin = providers.gradleProperty('android.builtInKotlin')
+        .map { it.toBoolean() }
+        .getOrElse(true)
+    if (!builtInKotlin) {
+        apply plugin: 'kotlin-android'
+    }
+}
 
 android {
     namespace 'com.zinonsoftware.video_compressor_plus'
@@ -38,10 +55,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -57,4 +70,10 @@ android {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'com.otaliastudios:transcoder:0.11.2'
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_17
+    }
 }
