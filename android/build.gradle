@@ -22,7 +22,19 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// Kotlin: AGP 9+ ships built-in Kotlin and enables it by default, and applying the
+// Kotlin Gradle Plugin (KGP) on top of it is a hard error. KGP is therefore applied only
+// when built-in Kotlin is not active: AGP < 9, or AGP 9+ with `android.builtInKotlin=false`
+// (apps that still carry unmigrated plugins). `pluginManager.apply` rather than the literal
+// `apply plugin:` form, because Flutter regex-scans this script for KGP and would warn
+// even on the built-in path, where this branch never runs.
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+def builtInKotlin = agpMajor >= 9 &&
+        project.findProperty('android.builtInKotlin')?.toString() != 'false'
+if (!builtInKotlin) {
+    pluginManager.apply('kotlin-android')
+}
 
 android {
     namespace 'com.zinonsoftware.video_compressor_plus'
@@ -38,9 +50,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -51,6 +60,16 @@ android {
     }
     lint {
         disable 'InvalidPackage'
+    }
+}
+
+// When KGP is applied, jvmTarget must match the Java target. Built-in Kotlin derives it
+// from compileOptions.targetCompatibility above.
+plugins.withId('org.jetbrains.kotlin.android') {
+    kotlin {
+        compilerOptions {
+            jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+        }
     }
 }
 

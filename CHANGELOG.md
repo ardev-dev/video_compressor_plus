@@ -1,3 +1,16 @@
+## 4.1.1
+
+Android: supports AGP 9 built-in Kotlin, so apps can set `android.builtInKotlin=true`
+(and drop the manual Kotlin Gradle Plugin) without this plugin blocking the build.
+
+- The Kotlin Gradle Plugin is applied only when built-in Kotlin is not active: AGP < 9,
+  or AGP 9+ with `android.builtInKotlin=false`. Applying it on top of built-in Kotlin is
+  a hard error in AGP 9, and Flutter warns that future releases will fail to build apps
+  whose plugins still apply it.
+- `kotlinOptions` replaced by `kotlin { compilerOptions }`, set only when KGP is applied;
+  built-in Kotlin derives `jvmTarget` from `compileOptions`.
+- Verified with Flutter 3.50.1 / AGP 9.5.2 in both modes.
+
 ## 4.1.0
 
 Completes the rename. Nothing in the package still carries the upstream
